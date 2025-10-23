@@ -34,7 +34,8 @@ int read(
 	uint32_t source,	// Index of source register
 	uint32_t offset,	// Source address = [source] + [offset]
 	uint32_t destination)
-{ // Index of destination register
+{
+	// Index of destination register
 
 	BYTE data;
 	if (read_mem(proc->regs[source] + offset, proc, &data))
@@ -49,12 +50,13 @@ int read(
 }
 
 int write(
-	struct pcb_t *proc,	// Process executing the instruction
-	BYTE data,		// Data to be wrttien into memory
+	struct pcb_t *proc,   // Process executing the instruction
+	BYTE data,			  // Data to be written into memory
 	uint32_t destination, // Index of destination register
 	uint32_t offset)
-{ // Destination address =
-	// [destination] + [offset]
+{
+	// Destination address = [destination] + [offset]
+
 	return write_mem(proc->regs[destination] + offset, proc, data);
 }
 

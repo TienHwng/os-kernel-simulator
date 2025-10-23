@@ -9,10 +9,8 @@ static BYTE _ram[RAM_SIZE];
 
 static struct {
 	uint32_t proc;	// ID of process currently uses this page
-	int index;	// Index of the page in the list of pages allocated
-			// to the process.
-	int next;	// The next page in the list. -1 if it is the last
-			// page.
+	int index;		// Index of the page in the list of pages allocated to the process.
+	int next;		// The next page in the list. -1 if it is the last page.
 } _mem_stat [NUM_PAGES];
 
 static pthread_mutex_t mem_lock;

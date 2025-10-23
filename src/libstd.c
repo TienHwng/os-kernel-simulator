@@ -12,12 +12,12 @@
 #include "syscall.h"
 
 int libsyscall (struct pcb_t *caller,
-             uint32_t syscall_idx,
-             arg_t a1,
-             arg_t a2,
-             arg_t a3)
+				uint32_t syscall_idx,
+				arg_t a1,
+				arg_t a2,
+				arg_t a3)
 {
-   struct sc_regs regs;
+	struct sc_regs regs;
 
 	/*
 	 * @bksysnet: Please note that the architecture design of
@@ -29,9 +29,10 @@ int libsyscall (struct pcb_t *caller,
 	 *            This design follows centralized registry as in 
 	 *            ntkernel but it keeps remain in userspace only.
 	 */
-   regs.a1 = a1;
-   regs.a2 = a2;
-   regs.a3 = a3;
+	
+	regs.a1 = a1;
+	regs.a2 = a2;
+	regs.a3 = a3;
 
-   return syscall(caller->krnl, caller->pid, syscall_idx, &regs);
+	return syscall(caller->krnl, caller->pid, syscall_idx, &regs);
 }

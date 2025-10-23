@@ -116,12 +116,12 @@ int pte_set_swap(struct pcb_t *caller, addr_t pgn, int swptyp, addr_t swpoff);
 uint32_t pte_get_entry(struct pcb_t *caller, addr_t pgn);
 int pte_set_entry(struct pcb_t *caller, addr_t pgn, uint32_t pte_val);
 int init_pte(addr_t *pte,
-             int pre,    // present
-             addr_t fpn,    // FPN
-             int drt,    // dirty
-             int swp,    // swap
-             int swptyp, // swap type
-             addr_t swpoff); //swap offset
+             int pre,        // present
+             addr_t fpn,     // FPN
+             int drt,        // dirty
+             int swp,        // swap
+             int swptyp,     // swap type
+             addr_t swpoff); // swap offset
 int __alloc(struct pcb_t *caller, int vmaid, int rgid, addr_t size, addr_t *alloc_addr);
 int __free(struct pcb_t *caller, int vmaid, int rgid);
 int __read(struct pcb_t *caller, int vmaid, int rgid, addr_t offset, BYTE *data);
@@ -133,12 +133,12 @@ int pgalloc(struct pcb_t *proc, uint32_t size, uint32_t reg_index);
 int pgfree_data(struct pcb_t *proc, uint32_t reg_index);
 int pgread(
 		struct pcb_t * proc, // Process executing the instruction
-		uint32_t source, // Index of source register
-		addr_t offset, // Source address = [source] + [offset]
+		uint32_t source,     // Index of source register
+		addr_t offset,       // Source address = [source] + [offset]
 		uint32_t destination);
 int pgwrite(
-		struct pcb_t * proc, // Process executing the instruction
-		BYTE data, // Data to be wrttien into memory
+		struct pcb_t * proc,  // Process executing the instruction
+		BYTE data,            // Data to be written into memory
 		uint32_t destination, // Index of destination register
 		addr_t offset);
 /* Local VM prototypes */

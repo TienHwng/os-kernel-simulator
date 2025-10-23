@@ -4,8 +4,8 @@
 #include "mm.h"
 #define MM64_BITS_PER_LONG 64
 
-#define PAGING64_CPU_BUS_WIDTH 57 /* 57 bit bus - MAX SPACE 4MB */
-#define PAGING64_PAGESZ  4096      /* 4KB or 12-bits PAGE NUMBER */
+#define PAGING64_CPU_BUS_WIDTH 57 	/* 57 bit bus - MAX SPACE 4MB */
+#define PAGING64_PAGESZ  4096      	/* 4KB or 12-bits PAGE NUMBER */
 
 #define GENMASK64(h, l) \
 	(((~0ULL) << (l)) & (~0ULL >> (MM64_BITS_PER_LONG  - (h) - 1)))

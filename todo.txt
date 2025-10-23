@@ -1,0 +1,9 @@
+Những phần trong source có todo
+
+    - sys_mem.c
+    - sched.c
+    - mm64.c
+    - mm-vm.c
+    - mm-memphy.c
+    - libmem.c
+    - os-mm.h
