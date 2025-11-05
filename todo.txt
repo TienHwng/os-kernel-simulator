@@ -1,9 +1,20 @@
 Những phần trong source có todo
-
-    - sys_mem.c
+    2.1 (tạm xong, chưa debug, đang tìm hiểu syscall - Hưng)
+    - queue.c
     - sched.c
-    - mm64.c
+
+    2.2.1
     - mm-vm.c
+    - mm64.c
+
+    2.2.2
     - mm-memphy.c
+
+    2.2.3 và collab với những file mm còn lại
     - libmem.c
+
+    2.2.4
+    - sys_mem.c
+
+    Chưa tìm thấy (ai tìm được thì báo tui biết với - Hưng)
     - os-mm.h
