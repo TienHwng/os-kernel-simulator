@@ -79,7 +79,7 @@ int get_pd_from_address(addr_t addr, addr_t* pgd, addr_t* p4d, addr_t* pud, addr
 	*pt = (addr&PAGING64_ADDR_PT_MASK)>>PAGING64_ADDR_PT_LOBIT;
 
 	/* TODO: implement the page direactories mapping */
-
+	
 	return 0;
 }
 
