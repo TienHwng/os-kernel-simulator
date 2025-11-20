@@ -50,7 +50,7 @@ int MEMPHY_seq_read(struct memphy_struct *mp, addr_t addr, BYTE *value)
 	if (mp == NULL)
 		return -1;
 
-	if (!mp->rdmflg)
+	if (mp->rdmflg)
 		return -1; /* Not compatible mode for sequential read */
 
 	MEMPHY_mv_csr(mp, addr);
@@ -90,7 +90,7 @@ int MEMPHY_seq_write(struct memphy_struct *mp, addr_t addr, BYTE value)
 	if (mp == NULL)
 		return -1;
 
-	if (!mp->rdmflg)
+	if (mp->rdmflg)
 		return -1; /* Not compatible mode for sequential read */
 
 	MEMPHY_mv_csr(mp, addr);
@@ -173,6 +173,18 @@ int MEMPHY_dump(struct memphy_struct *mp)
   	/*TODO dump memphy contnt mp->storage
 	 *     for tracing the memory content
 	 */
+
+	if( mp == NULL || mp->storage == NULL){
+		printf("Your physical memory's device is invaild \n");
+		return -1;
+	}
+
+	printf("START TRACING MEMORY CONTENT \n");
+	for(int i =0; i < mp -> maxsz; i++){
+		printf("Address %08x: %d\n", i, mp->storage[i]);
+	}
+	printf("END TRACING MEMORY CONTENT \n");
+	
 	return 0;
 }
 
