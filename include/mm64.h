@@ -1,7 +1,10 @@
 #ifndef MM64_H
 #define MM64_H
 
+
 #include "mm.h"
+#define MM64 // thêm để xài mm64, cần thì xóa
+
 #define MM64_BITS_PER_LONG 64
 
 #define PAGING64_CPU_BUS_WIDTH 57 	/* 57 bit bus - MAX SPACE 4MB */

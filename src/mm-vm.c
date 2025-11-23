@@ -64,7 +64,7 @@ struct vm_rg_struct *get_vm_area_node_at_brk(struct pcb_t *caller, int vmaid, ad
 {
 	struct vm_rg_struct * newrg;
 	/* TODO retrive current vma to obtain newrg, current comment out due to compiler redundant warning*/
-	struct vm_area_struct *cur_vma = get_vma_by_num(caller->kernl->mm, vmaid);
+	struct vm_area_struct *cur_vma = get_vma_by_num(caller->krnl->mm, vmaid);
 	if(cur_vma == NULL) return NULL;
 	
 	newrg = malloc(sizeof(struct vm_rg_struct));
