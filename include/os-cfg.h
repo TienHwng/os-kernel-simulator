@@ -13,7 +13,7 @@
 
 #define MLQ_SCHED 1
 #define MAX_PRIO 140
-
+#define MM64 // để debug chế độ 64 bit
 #define MM_PAGING
 //#define MM_FIXED_MEMSZ
 //#define VMDBG 1
@@ -28,6 +28,6 @@
  *      
  */
 //#define MM64 1
-#undef MM64
+// #undef MM64
 
 #endif

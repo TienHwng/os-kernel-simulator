@@ -166,7 +166,7 @@ int inc_vma_limit(struct pcb_t *caller, int vmaid, addr_t inc_sz)
 	// if (vm_map_ram(caller, area->rg_start, area->rg_end, 
 	// 			old_end, incnumpage , newrg) < 0)
 	// 	return -1; /* Map the memory to MEMRAM */
-	struct vm_area_struct *cur_vma = get_vma_by_num(caller->mm, vmaid);
+	struct vm_area_struct *cur_vma = get_vma_by_num(caller->krnl->mm, vmaid);
 	if(cur_vma == NULL) return -1;
 	
 	int inc_amt = PAGING_PAGE_ALIGNSZ(inc_sz);
@@ -200,7 +200,7 @@ int inc_vma_limit(struct pcb_t *caller, int vmaid, addr_t inc_sz)
 	}
 
 	free(area);
-	enlist_vm_rg_node(&cur_vma->vm->freerg_list, newrg);
+	enlist_vm_rg_node(&cur_vma->vm_freerg_list, newrg);
 	return 0;
 }
 
