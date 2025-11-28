@@ -3,7 +3,7 @@
 #include "syscall.h"
 #include "stdio.h"
 
-int __sys_xxxhandler(struct pcb_t *caller, struct sc_regs *regs)
+int __sys_xxxhandler(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
 {
     /* TODO: implement syscall job */
     printf("The first system call parameter %d\n", regs->a1);

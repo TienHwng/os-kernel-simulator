@@ -226,7 +226,7 @@ int __swap_cp_page(struct memphy_struct *mpsrc, addr_t srcfpn,
  */
 int init_mm(struct mm_struct *mm, struct pcb_t *caller)
 {
-	printf("[ERROR] %s: This feature 32 bit mode is deprecated\n", __func__);
+	// printf("[ERROR] %s: This feature 32 bit mode is deprecated\n", __func__);
 	return 0;
 }
 
