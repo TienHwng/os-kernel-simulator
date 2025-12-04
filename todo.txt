@@ -19,3 +19,6 @@ Những phần trong source có todo
     Chưa tìm thấy (ai tìm được thì báo tui biết với - Hưng)
     - os-mm.h
     - os-cfg.h
+
+Todo:
+    - Check xem code co dung toi running list khong

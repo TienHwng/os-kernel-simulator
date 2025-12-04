@@ -2,6 +2,9 @@
 #define MM64_H
 
 #include "mm.h"
+
+#define PAGING64_TABLE_ENTRIES 512
+
 #define MM64_BITS_PER_LONG 64
 
 #define PAGING64_CPU_BUS_WIDTH 57 	/* 57 bit bus - MAX SPACE 4MB */

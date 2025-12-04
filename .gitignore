@@ -5,4 +5,4 @@ obj/
 os
 
 # Junk files
-src/syscalltbl.lst
+# src/syscalltbl.lst
