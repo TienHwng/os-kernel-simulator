@@ -8,6 +8,7 @@
  * for the sole purpose of studying while attending the course CO2018.
  */
 
+#include "common.h"
 #include "os-mm.h"
 #include "syscall.h"
 #include "libmem.h"
@@ -20,56 +21,69 @@
 #include "mm.h"
 #endif
 
-//typedef char BYTE;
+// typedef char BYTE;   // nếu BYTE chưa được định nghĩa ở nơi khác thì mở comment dòng này
 
-int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
+/*
+ * System call handler cho SYSCALL 17: SYSMEM_OP
+ * - krnl : kernel context (chứa ready_queue, running_list, mram, ...)
+ * - pid  : PID của tiến trình gọi syscall
+ * - regs : thanh ghi syscall (a1 = memop, a2/a3 = tham số)
+ */
+int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs *regs)
 {
-	int memop = regs->a1;
-	BYTE value;
-   
-	/* TODO THIS DUMMY CREATE EMPTY PROC TO AVOID COMPILER NOTIFY 
-	 *      need to be eliminated
-	 */
-	struct pcb_t *caller = malloc(sizeof(struct pcb_t));
+    int  memop = regs->a1;
+    BYTE value;
 
-	/*
-	 * @bksysnet: Please note in the dual spacing design
-	 *            syscall implementations are in kernel space.
-	 */
+    /* Tìm PCB tương ứng pid trong running_list của kernel */
+    struct pcb_t   *caller       = NULL;
+    struct queue_t *running_list = krnl->running_list;   /* running_list là con trỏ */
 
-	/* TODO: Traverse proclist to terminate the proc
-	 *       stcmp to check the process match proc_name
-	 */
-//	struct queue_t *running_list = krnl->running_list;
+    if (running_list != NULL) {
+        for (int i = 0; i < running_list->size; i++) {
+            struct pcb_t *proc = running_list->proc[i];
+            if (proc != NULL && proc->pid == pid) {
+                caller = proc;
+                break;
+            }
+        }
+    }
 
-	/* TODO Maching and marking the process */
-	/* user process are not allowed to access directly pcb in kernel space of syscall */
-	//....
-	
-	switch (memop) {
-	case SYSMEM_MAP_OP:
-		/* Reserved process case*/
-		vmap_pgd_memset(caller, regs->a2, regs->a3);
-		break;
-	case SYSMEM_INC_OP:
-		inc_vma_limit(caller, regs->a2, regs->a3);
-		break;
-	case SYSMEM_SWP_OP:
-		__mm_swap_page(caller, regs->a2, regs->a3);
-		break;
-	case SYSMEM_IO_READ:
-		MEMPHY_read(caller->krnl->mram, regs->a2, &value);
-		regs->a3 = value;
-			break;
-	case SYSMEM_IO_WRITE:
-		MEMPHY_write(caller->krnl->mram, regs->a2, regs->a3);
-		break;
-	default:
-		printf("Memop code: %d\n", memop);
-		break;
-	}
-   
-	return 0;
+    if (caller == NULL) {
+        /* Không tìm được process có pid tương ứng */
+        return -1;
+    }
+
+    switch (memop) {
+    case SYSMEM_MAP_OP:
+        /* Dummy mapping bằng page directory, không cấp phát frame thực */
+        vmap_pgd_memset(caller, regs->a2, regs->a3);
+        break;
+
+    case SYSMEM_INC_OP:
+        /* Tăng giới hạn VMA (heap/break pointer) của tiến trình */
+        inc_vma_limit(caller, regs->a2, regs->a3);
+        break;
+
+    case SYSMEM_SWP_OP:
+        /* Hoán đổi trang (swap in/out) cho tiến trình caller */
+        __mm_swap_page(caller, regs->a2, regs->a3);
+        break;
+
+    case SYSMEM_IO_READ:
+        /* Đọc 1 byte trực tiếp từ physical memory của kernel */
+        MEMPHY_read(krnl->mram, regs->a2, &value);
+        regs->a3 = value;   /* trả kết quả qua thanh ghi a3 */
+        break;
+
+    case SYSMEM_IO_WRITE:
+        /* Ghi 1 byte trực tiếp xuống physical memory của kernel */
+        MEMPHY_write(krnl->mram, regs->a2, regs->a3);
+        break;
+
+    default:
+        printf("Memop code: %d\n", memop);
+        break;
+    }
+
+    return 0;
 }
-
-
