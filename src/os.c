@@ -112,6 +112,7 @@ static void * ld_routine(void * args) {
 #endif
 	int i = 0;
 	printf("ld_routine\n");
+	os.mm = malloc(sizeof(struct mm_struct));
 	while (i < num_processes) {
 		struct pcb_t * proc = load(ld_processes.path[i]);
 		struct krnl_t * krnl = proc->krnl = &os;	
@@ -123,7 +124,7 @@ static void * ld_routine(void * args) {
 			next_slot(timer_id);
 		}
 #ifdef MM_PAGING
-		krnl->mm = malloc(sizeof(struct mm_struct));
+		// krnl->mm = malloc(sizeof(struct mm_struct));
 		init_mm(krnl->mm, proc);
 		krnl->mram = mram;
 		krnl->mswp = mswp;

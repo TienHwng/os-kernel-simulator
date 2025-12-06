@@ -7,6 +7,8 @@
 
 #define MM64_BITS_PER_LONG 64
 
+#define PAGING64_TABLE_ENTRIES 512 	/* 2^9 entries per table */
+
 #define PAGING64_CPU_BUS_WIDTH 57 	/* 57 bit bus - MAX SPACE 4MB */
 #define PAGING64_PAGESZ  4096      	/* 4KB or 12-bits PAGE NUMBER */
 

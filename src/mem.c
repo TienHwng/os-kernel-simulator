@@ -139,6 +139,7 @@ int write_mem(addr_t address, struct pcb_t * proc, BYTE data) {
 		return 0;
 	}else{
 		return 1;
+
 	}
 }
 
