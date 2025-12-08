@@ -1039,52 +1039,33 @@ addr_t alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_st
 * @incpgnum  : number of mapped page
 * @ret_rg    : returned region
 */
-addr_t vm_map_ram(struct pcb_t *caller, addr_t astart, addr_t aend, addr_t mapstart, int incpgnum, struct vm_rg_struct *ret_rg)
-{
-	struct framephy_struct *frm_lst = NULL;
-	addr_t ret_alloc = alloc_pages_range(caller, incpgnum, &frm_lst);
-	// int pgnum = incpgnum;
+addr_t vm_map_ram(struct pcb_t *caller, addr_t astart, addr_t aend, addr_t mapstart, int incpgnum, struct vm_rg_struct *ret_rg) {
+	printf("test1\n\n");
+    struct framephy_struct *frm_lst = NULL;
+    addr_t ret_alloc = 0;
+    int pgnum = incpgnum;
 
-	/*@bksysnet: author provides a feasible solution of getting frames
-	*FATAL logic in here, wrong behaviour if we have not enough page
-	*i.e. we request 1000 frames meanwhile our RAM has size of 3 frames
-	*Don't try to perform that case in this simple work, it will result
-	*in endless procedure of swap-off to get frame and we have not provide
-	*duplicate control mechanism, keep it simple
-	*/
-	
-	// ret_alloc = alloc_pages_range(caller, pgnum, &frm_lst);
+    /*@bksysnet: author provides a feasible solution of getting frames
+     *FATAL logic in here, wrong behaviour if we have not enough page
+     *i.e. we request 1000 frames meanwhile our RAM has size of 3 frames
+     *Don't try to perform that case in this simple work, it will result
+     *in endless procedure of swap-off to get frame and we have not provide
+     *duplicate control mechanism, keep it simple
+     */
+    ret_alloc = alloc_pages_range(caller, pgnum, &frm_lst);
+    if (ret_alloc < 0 && ret_alloc != -3000)
+        return -1;
 
-	if (ret_alloc < 0 && ret_alloc != -3000) return -1;
+    /* Out of memory */
+    if (ret_alloc == -3000) {
+        return -1;
+    }
 
-	/* Out of memory */
-	if (ret_alloc == -3000)
-	{
-		return -1;
-	}
+    /* it leaves the case of memory is enough but half in ram, half in swap
+     * do the swaping all to swapper to get the all in ram */
+    vmap_page_range(caller, mapstart, incpgnum, frm_lst, ret_rg);
 
-	/* it leaves the case of memory is enough but half in ram, half in swap
-	* do the swaping all to swapper to get the all in ram */
-	if(vmap_page_range(caller, mapstart, incpgnum, frm_lst, ret_rg) < 0){
-		struct framephy_struct *freefp_str;
-		while(frm_lst != NULL){
-			freefp_str = frm_lst;
-			frm_lst = frm_lst->fp_next;
-
-			//MEMPHY_put_freefp(caller->krnl->mram, freefp_str->fpn);
-			free(freefp_str);
-		}
-		return -1;
-	}
-
-	struct framephy_struct *freefp_str;
-	while(frm_lst != NULL){
-		freefp_str = frm_lst;
-		frm_lst = frm_lst->fp_next;
-		free(freefp_str);
-	}
-
-	return 0;
+    return 0;
 }
 
 /* Swap copy content page from source frame to destination frame

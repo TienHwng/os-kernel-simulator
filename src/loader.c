@@ -42,6 +42,9 @@ struct pcb_t * load(const char * path) {
 	proc->bp = PAGE_SIZE;
 	proc->pc = 0;
 
+	// proc->krnl = (struct krnl_t)malloc(sizeof(struct krnl_t));
+    // proc->krnl->mm = (struct mm_struct)malloc(sizeof(struct mm_struct));
+
 	/* Read process code from file */
 	FILE * file;
 	if ((file = fopen(path, "r")) == NULL) {

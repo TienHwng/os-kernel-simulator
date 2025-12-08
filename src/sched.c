@@ -119,22 +119,22 @@ struct pcb_t * get_mlq_proc(void) {
     pthread_mutex_unlock(&queue_lock);
     return proc;
 
-	// Quang
-	pthread_mutex_lock(&queue_lock);
-    if (isSlotEmpty()) initSlot();
+	// // Quang
+	// pthread_mutex_lock(&queue_lock);
+    // if (isSlotEmpty()) initSlot();
 
-    for (int i = 0; i < MAX_PRIO; i ++) {
-        if (!empty(&mlq_ready_queue[i]) && slot[i] > 0) {
-            proc = dequeue(&mlq_ready_queue[i]);
-            slot[i]--;
-            break;
-        }
-    }
+    // for (int i = 0; i < MAX_PRIO; i ++) {
+    //     if (!empty(&mlq_ready_queue[i]) && slot[i] > 0) {
+    //         proc = dequeue(&mlq_ready_queue[i]);
+    //         slot[i]--;
+    //         break;
+    //     }
+    // }
 
-	if (proc != NULL) enqueue(&running_list, proc);
+	// if (proc != NULL) enqueue(&running_list, proc);
 
-    pthread_mutex_unlock(&queue_lock);
-	return proc;
+    // pthread_mutex_unlock(&queue_lock);
+	// return proc;
 }
 
 void put_mlq_proc(struct pcb_t * proc) {

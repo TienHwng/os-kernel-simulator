@@ -3,12 +3,11 @@
 
 #include "mm.h"
 
-#define PAGING64_TABLE_ENTRIES 512
-
 #define MM64_BITS_PER_LONG 64
 
 #define PAGING64_CPU_BUS_WIDTH 57 	/* 57 bit bus - MAX SPACE 4MB */
 #define PAGING64_PAGESZ  4096      	/* 4KB or 12-bits PAGE NUMBER */
+#define PAGING64_TABLE_ENTRIES 512 /* 2^9 entries per page table level */
 
 #define GENMASK64(h, l) \
 	(((~0ULL) << (l)) & (~0ULL >> (MM64_BITS_PER_LONG  - (h) - 1)))
@@ -55,6 +54,7 @@
 #define PAGING64_ADDR_PGD(addr)   ((addr&PAGING64_ADDR_PGD_MASK)>>PAGING64_ADDR_PGD_LOBIT)
 //GETVAL(addr,PAGING64_ADDR_PGD_MASK,PAGING64_ADDR_PGD_LOBIT)
 
+// #define PAGING_PGN(addr)    (addr >> PAGING64_ADDR_PT_SHIFT)
 
 /* Masks */
 #define PAGING64_ADDR_OFFST_MASK  GENMASK64(PAGING_ADDR_OFFST_HIBIT,PAGING_ADDR_OFFST_LOBIT)
@@ -64,6 +64,8 @@
 #define PAGING64_ADDR_P4D_MASK  GENMASK64(PAGING64_ADDR_P4D_HIBIT,PAGING64_ADDR_P4D_LOBIT)
 #define PAGING64_ADDR_PGD_MASK  GENMASK64(PAGING64_ADDR_PGD_HIBIT,PAGING64_ADDR_PGD_LOBIT)
 
-
+// them vao
+void pte_create_entry(struct pcb_t *caller, addr_t pgn);
+void free_pgd(addr_t *pgd);
 
 #endif

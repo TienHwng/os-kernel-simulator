@@ -1,3 +1,6 @@
+# VSCode
+.vscode/
+
 # Object files
 obj/
 
@@ -5,4 +8,8 @@ obj/
 os
 
 # Junk files
-# src/syscalltbl.lst
+src/syscalltbl.lst
+# note.txt
+
+
+.clang-format
