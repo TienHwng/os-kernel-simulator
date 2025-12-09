@@ -7,9 +7,9 @@ obj/
 # Binary files
 os
 
+# Junk folders
+temp/
+
 # Junk files
 src/syscalltbl.lst
 # note.txt
-
-
-.clang-format
