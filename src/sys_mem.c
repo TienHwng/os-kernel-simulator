@@ -8,6 +8,8 @@
  * for the sole purpose of studying while attending the course CO2018.
  */
 
+// clang-format off
+
 #include "libmem.h"
 #include "os-mm.h"
 #include "queue.h"
@@ -21,18 +23,19 @@
 #include "mm.h"
 #endif
 
+// clang-format on
+
 // typedef char BYTE;
 
-int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
-{
-	int memop = regs->a1;
+int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs *regs) {
+	int	 memop = regs->a1;
 	BYTE value;
-   
-	/* TODO THIS DUMMY CREATE EMPTY PROC TO AVOID COMPILER NOTIFY 
+
+	/* TODO THIS DUMMY CREATE EMPTY PROC TO AVOID COMPILER NOTIFY
 	 *      need to be eliminated
 	 */
 	struct pcb_t *caller = malloc(sizeof(struct pcb_t));
-	caller->krnl = krnl;
+	caller->krnl		 = krnl;
 
 	/*
 	 * @bksysnet: Please note in the dual spacing design
@@ -47,13 +50,13 @@ int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
 	/* TODO Maching and marking the process */
 	/* user process are not allowed to access directly pcb in kernel space of syscall */
 	//....
-	
+
 	// printf("SYSCALL: a1= %d, a2= %d, a3= %d\n", memop, regs->a2, regs->a3);
-    if (krnl->mm == NULL) {
-        printf("Error: krnl->mm is NULL in __sys_memmap\n");
-        free(caller);
-        return -1;
-    }
+	if (krnl->mm == NULL) {
+		printf("Error: krnl->mm is NULL in __sys_memmap\n");
+		free(caller);
+		return -1;
+	}
 
 	switch (memop) {
 	case SYSMEM_MAP_OP:
@@ -69,7 +72,7 @@ int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
 	case SYSMEM_IO_READ:
 		MEMPHY_read(caller->krnl->mram, regs->a2, &value);
 		regs->a3 = value;
-			break;
+		break;
 	case SYSMEM_IO_WRITE:
 		MEMPHY_write(caller->krnl->mram, regs->a2, regs->a3);
 		break;
@@ -79,6 +82,6 @@ int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
 	}
 
 	free(caller);
-   
+
 	return 0;
 }

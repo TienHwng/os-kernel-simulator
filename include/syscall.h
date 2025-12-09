@@ -10,7 +10,6 @@
 
 #include "common.h"
 
-
 struct sc_regs {
 	arg_t a1;
 	arg_t a2;
@@ -30,14 +29,12 @@ struct sc_regs {
 	int32_t flags;
 };
 
-
 /* This is used purely for kernel trace the table of system call */
-extern const char* sys_call_table[];
-extern const int syscall_table_size;
+extern const char *sys_call_table[];
+extern const int   syscall_table_size;
 
 /* libsyscall interface */
-int __mm_swap_page(struct pcb_t *, addr_t , addr_t);
-int libsyscall(struct pcb_t*, uint32_t, arg_t, arg_t, arg_t);
-int syscall(struct krnl_t*, uint32_t, uint32_t, struct sc_regs*);
-int __sys_ni_syscall(struct krnl_t*, struct sc_regs*);
-
+int __mm_swap_page(struct pcb_t *, addr_t, addr_t);
+int libsyscall(struct pcb_t *, uint32_t, arg_t, arg_t, arg_t);
+int syscall(struct krnl_t *, uint32_t, uint32_t, struct sc_regs *);
+int __sys_ni_syscall(struct krnl_t *, struct sc_regs *);
