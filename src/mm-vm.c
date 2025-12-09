@@ -139,7 +139,8 @@ int inc_vma_limit(struct pcb_t *caller, int vmaid, addr_t inc_sz)
 
 	//addr_t inc_amt;
 
-	// int incnumpage =  inc_amt / PAGING_PAGESZ;
+	int inc_amt = PAGING_PAGE_ALIGNSZ(inc_sz); // align to page size (integer num of pages)
+	int incnumpage =  inc_amt / PAGING_PAGESZ;
 
 	/* TODO Validate overlap of obtained region */
 	// if (validate_overlap_vm_area(caller, vmaid, area->rg_start, area->rg_end) < 0)
@@ -152,14 +153,10 @@ int inc_vma_limit(struct pcb_t *caller, int vmaid, addr_t inc_sz)
 	 * now will be alloc real ram region 
 	 */
 
-	// if (vm_map_ram(caller, area->rg_start, area->rg_end, 
-	// 			old_end, incnumpage , newrg) < 0)
-	// 	return -1; /* Map the memory to MEMRAM */
 	
 	struct vm_area_struct *cur_vma = get_vma_by_num(caller->krnl->mm, vmaid);
 	if(cur_vma == NULL) return -1;
 	
-	int inc_amt = PAGING_PAGE_ALIGNSZ(inc_sz); // align to page size (integer num of pages)
 	struct vm_rg_struct *area = get_vm_area_node_at_brk(caller, vmaid, inc_sz, inc_amt);
 	if(area == NULL) return -1;
 	
@@ -167,21 +164,31 @@ int inc_vma_limit(struct pcb_t *caller, int vmaid, addr_t inc_sz)
 		free(area);
 		return -1;
 	}
-
+	
 	int old_end = cur_vma->sbrk;
 	cur_vma->sbrk += inc_sz; // increase the sbrk by raw size
-
+	if (cur_vma->sbrk > cur_vma->vm_end) {
+        cur_vma->vm_end += inc_amt;
+    }
 	struct vm_rg_struct *newrg = malloc(sizeof(struct vm_rg_struct));
 	if(newrg == NULL){
 		free(area);
 		return -1;
 	}
+	
+	if (vm_map_ram(caller, area->rg_start, area->rg_end, old_end, incnumpage , newrg) < 0){
+		free(area);
+		free(newrg);
+		return -1; /* Map the memory to MEMRAM */
+	}
+		
 
 	newrg->rg_start = old_end;
 	newrg->rg_end = cur_vma->sbrk;
 	newrg->rg_next = NULL;
 
 	enlist_vm_rg_node(&cur_vma->vm_freerg_list, newrg);
+	free(area);
 	return 0;
 }
 
