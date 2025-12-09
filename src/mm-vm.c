@@ -28,6 +28,8 @@
 struct vm_area_struct *get_vma_by_num(struct mm_struct *mm, int vmaid) {
     struct vm_area_struct *pvma = mm->mmap;
 
+    // caller -> krnl -> mm -> mmap;
+
     if (mm->mmap == NULL)
         return NULL;
 
@@ -61,8 +63,19 @@ struct vm_rg_struct *get_vm_area_node_at_brk(struct pcb_t *caller, int vmaid, ad
     
     struct vm_area_struct *cur_vma = get_vma_by_num(caller->krnl->mm, vmaid);
     
+    /* TODO retrive current vma to obtain newrg, current comment out due to compiler redundant warning*/
+	//struct vm_area_struct *cur_vma = get_vma_by_num(caller->kernl->mm, vmaid);
+
+	//newrg = malloc(sizeof(struct vm_rg_struct));
+
+	/* TODO: update the newrg boundary
+	// newrg->rg_start = ...
+	// newrg->rg_end = ...
+	*/
+
     if (cur_vma == NULL)
-    return NULL;
+        return NULL;
+    
     struct vm_rg_struct *newrg = malloc(sizeof(struct vm_rg_struct));
 
     newrg->rg_start = cur_vma->sbrk;
@@ -108,14 +121,14 @@ int validate_overlap_vm_area(struct pcb_t *caller, int vmaid, addr_t vmastart, a
 int inc_vma_limit(struct pcb_t *caller, int vmaid, addr_t inc_sz) {
     struct vm_area_struct *cur_vma = get_vma_by_num(caller->krnl->mm, vmaid);
     if (cur_vma == NULL)
-    return -1;
+        return -1;
     
     int aligned = PAGING_PAGE_ALIGNSZ(inc_sz);
     int npages = aligned / PAGING_PAGESZ;
     
     struct vm_rg_struct *area = get_vm_area_node_at_brk(caller, vmaid, inc_sz, aligned);
     if (area == NULL)
-    return -1;
+        return -1;
     
     if (validate_overlap_vm_area(caller, vmaid, area->rg_start, area->rg_end) < 0) {
         free(area);

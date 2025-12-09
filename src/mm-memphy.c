@@ -170,9 +170,14 @@ int MEMPHY_get_freefp(struct memphy_struct *mp, addr_t *retfpn)
 
 int MEMPHY_dump(struct memphy_struct *mp)
 {
-  	/*TODO dump memphy contnt mp->storage
+  	/*TODO (Done): dump memphy contnt mp->storage
 	 *     for tracing the memory content
 	 */
+
+	for (int i = 0; i < mp->maxsz; i++) {
+		if (mp->storage[i] != 0)
+			printf("BYTE %08x: %d\n", i, mp->storage[i]);
+    }
 	return 0;
 }
 
@@ -187,6 +192,31 @@ int MEMPHY_put_freefp(struct memphy_struct *mp, addr_t fpn)
 	mp->free_fp_list = newnode;
 
 	return 0;
+}
+
+int MEMPHY_put_usedfp(struct memphy_struct *mp, addr_t fpn) {
+    struct framephy_struct *fp = mp->used_fp_list;
+    struct framephy_struct *newnode = malloc(sizeof(struct framephy_struct));
+
+    newnode->fpn = fpn;
+    newnode->fp_next = fp;
+    mp->used_fp_list = newnode;
+
+    return 0;
+}
+
+int MEMPHY_count_usedfp(struct memphy_struct *mp) {
+    struct framephy_struct *fp = mp->free_fp_list;
+    int count = 0;
+
+    while (fp != NULL) {
+        count++;
+        fp = fp->fp_next;
+    }
+
+    count = (mp->maxsz / PAGING_PAGESZ) - count;
+
+    return count;
 }
 
 /*

@@ -25,21 +25,28 @@ File y chang nhau:
     - syscall
     - sys_xxxhandler
     - sys_listcall
+    - sysmem
     - paging
     - mm
     - mem
+    - libstd
+    - mm-vm
+    - 
 
 
 
 Những File khác nhau:
     Bên .h
     - mm.h
-    - mm64.h 
+    - mm64.h
 
     Bên .c
     - os có khác 1 chút ở chỗ malloc (cần check)
     - mm-memphy: chưa làm phần dump, khác hàm memphy_write, bên quang có thêm 2 hàm memphy put used và memphy count used
     - loader bên quang có bỏ ngay chỗ cấp phát proc->krnl
+    - libmem
+    - mm64
+
 
 
 
@@ -51,3 +58,8 @@ Những file khỏi check tại làm đúng rồi
 
 Khác với tuấn anh
     - ở chỗ malloc ngay phần if def paging ở hàm ld routine
+
+
+
+Bắt đầu check
+    - mm64
