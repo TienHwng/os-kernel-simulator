@@ -1,0 +1,15 @@
+# VSCode
+.vscode/
+
+# Object files
+obj/
+
+# Binary files
+os
+
+# Junk folders
+temp/
+
+# Junk files
+src/syscalltbl.lst
+# note.txt

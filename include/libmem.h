@@ -10,14 +10,14 @@
 
 #include "common.h"
 
-#define SYSMEM_MAP_OP 1
-#define SYSMEM_INC_OP 2
-#define SYSMEM_SWP_OP 3
-#define SYSMEM_IO_READ 4
+#define SYSMEM_MAP_OP	1
+#define SYSMEM_INC_OP	2
+#define SYSMEM_SWP_OP	3
+#define SYSMEM_IO_READ	4
 #define SYSMEM_IO_WRITE 5
 
 extern struct vm_area_struct *get_vma_by_num(struct mm_struct *mm, int vmaid);
-int liballoc(struct pcb_t *, addr_t, uint32_t);
-int libfree(struct pcb_t *, uint32_t);
-int libread(struct pcb_t*, uint32_t, addr_t, uint32_t*);
-int libwrite(struct pcb_t*, BYTE, uint32_t, addr_t);
+int							  liballoc(struct pcb_t *, addr_t, uint32_t);
+int							  libfree(struct pcb_t *, uint32_t);
+int							  libread(struct pcb_t *, uint32_t, addr_t, uint32_t *);
+int							  libwrite(struct pcb_t *, BYTE, uint32_t, addr_t);

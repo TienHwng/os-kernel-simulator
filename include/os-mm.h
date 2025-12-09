@@ -14,10 +14,10 @@
 #include <stdint.h>
 
 #define MM_PAGING
-#define PAGING_MAX_MMSWP 4 /* max number of supported swapped space */
+#define PAGING_MAX_MMSWP	 4 /* max number of supported swapped space */
 #define PAGING_MAX_SYMTBL_SZ 30
 
-/* 
+/*
  * @bksysnet: in long address mode of 64bit or original 32bit
  * the address type need to be redefined
  */
@@ -28,26 +28,25 @@
 #define ADDR_TYPE uint32_t
 #endif
 
-typedef char BYTE;
+typedef char	  BYTE;
 typedef ADDR_TYPE addr_t;
-//typedef unsigned int uint32_t;
+// typedef unsigned int uint32_t;
 
-
-/* 
+/*
  * @bksysnet: the format string need to be redefined
  *            based on the address mode
  */
 #ifdef MM64
-#define FORMAT_ADDR "%lld"
+#define FORMAT_ADDR	 "%lld"
 #define FORMATX_ADDR "%16llx"
 #else
-#define FORMAT_ADDR "%d"
+#define FORMAT_ADDR	 "%d"
 #define FORMATX_ADDR "%08x"
 #endif
 
-struct pgn_t{
-	addr_t pgn;
-	struct pgn_t *pg_next; 
+struct pgn_t {
+	addr_t		  pgn;
+	struct pgn_t *pg_next;
 };
 
 /*
@@ -65,27 +64,27 @@ struct vm_rg_struct {
  */
 struct vm_area_struct {
 	unsigned long vm_id;
-	addr_t vm_start;
-	addr_t vm_end;
+	addr_t		  vm_start;
+	addr_t		  vm_end;
 
 	addr_t sbrk;
-/*
- * Derived field
- * unsigned long vm_limit = vm_end - vm_start
- */
-	struct mm_struct *vm_mm;
-	struct vm_rg_struct *vm_freerg_list;
+	/*
+	 * Derived field
+	 * unsigned long vm_limit = vm_end - vm_start
+	 */
+	struct mm_struct	  *vm_mm;
+	struct vm_rg_struct	  *vm_freerg_list;
 	struct vm_area_struct *vm_next;
 };
 
-/* 
+/*
  * Memory management struct
  */
 struct mm_struct {
- /* TODO: The structure of page diractory need to be justify
-  *       as your design. The single point is draft to avoid
-  *       compiler noisy only, this design need to be revised
-  */
+	/* TODO: The structure of page diractory need to be justify
+	 *       as your design. The single point is draft to avoid
+	 *       compiler noisy only, this design need to be revised
+	 */
 #ifdef MM64
 	addr_t *pgd;
 	addr_t *p4d;
@@ -108,20 +107,20 @@ struct mm_struct {
 /*
  * FRAME/MEM PHY struct
  */
-struct framephy_struct { 
-	addr_t fpn;
+struct framephy_struct {
+	addr_t					fpn;
 	struct framephy_struct *fp_next;
 
 	/* Resereed for tracking allocated framed */
-	struct mm_struct* owner;
+	struct mm_struct *owner;
 };
 
 struct memphy_struct {
 	/* Basic field of data and size */
 	BYTE *storage;
-	int maxsz;
-	
-	/* Sequential device fields */ 
+	int	  maxsz;
+
+	/* Sequential device fields */
 	int rdmflg;
 	int cursor;
 

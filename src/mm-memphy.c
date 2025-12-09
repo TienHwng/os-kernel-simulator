@@ -24,13 +24,11 @@
  *  @mp: memphy struct
  *  @offset: offset
  */
-int MEMPHY_mv_csr(struct memphy_struct *mp, addr_t offset)
-{
+int MEMPHY_mv_csr(struct memphy_struct *mp, addr_t offset) {
 	int numstep = 0;
 
 	mp->cursor = 0;
-	while (numstep < offset && numstep < mp->maxsz)
-	{
+	while (numstep < offset && numstep < mp->maxsz) {
 		/* Traverse sequentially */
 		mp->cursor = (mp->cursor + 1) % mp->maxsz;
 		numstep++;
@@ -45,8 +43,7 @@ int MEMPHY_mv_csr(struct memphy_struct *mp, addr_t offset)
  *  @addr: address
  *  @value: obtained value
  */
-int MEMPHY_seq_read(struct memphy_struct *mp, addr_t addr, BYTE *value)
-{
+int MEMPHY_seq_read(struct memphy_struct *mp, addr_t addr, BYTE *value) {
 	if (mp == NULL)
 		return -1;
 
@@ -65,8 +62,7 @@ int MEMPHY_seq_read(struct memphy_struct *mp, addr_t addr, BYTE *value)
  *  @addr: address
  *  @value: obtained value
  */
-int MEMPHY_read(struct memphy_struct *mp, addr_t addr, BYTE *value)
-{
+int MEMPHY_read(struct memphy_struct *mp, addr_t addr, BYTE *value) {
 	if (mp == NULL)
 		return -1;
 
@@ -84,8 +80,7 @@ int MEMPHY_read(struct memphy_struct *mp, addr_t addr, BYTE *value)
  *  @addr: address
  *  @data: written data
  */
-int MEMPHY_seq_write(struct memphy_struct *mp, addr_t addr, BYTE value)
-{
+int MEMPHY_seq_write(struct memphy_struct *mp, addr_t addr, BYTE value) {
 
 	if (mp == NULL)
 		return -1;
@@ -105,14 +100,14 @@ int MEMPHY_seq_write(struct memphy_struct *mp, addr_t addr, BYTE value)
  *  @addr: address
  *  @data: written data
  */
-int MEMPHY_write(struct memphy_struct *mp, addr_t addr, BYTE data)
-{
+int MEMPHY_write(struct memphy_struct *mp, addr_t addr, BYTE data) {
 	if (mp == NULL)
 		return -1;
 
 	if (mp->rdmflg)
 		mp->storage[addr] = data;
-	else /* Sequential access device */
+	else 
+		/* Sequential access device */
 		return MEMPHY_seq_write(mp, addr, data);
 
 	return 0;
@@ -122,42 +117,39 @@ int MEMPHY_write(struct memphy_struct *mp, addr_t addr, BYTE data)
  *  MEMPHY_format-format MEMPHY device
  *  @mp: memphy struct
  */
-int MEMPHY_format(struct memphy_struct *mp, int pagesz)
-{
+int MEMPHY_format(struct memphy_struct *mp, int pagesz) {
 	/* This setting come with fixed constant PAGESZ */
-	int numfp = mp->maxsz / pagesz;
+	int						numfp = mp->maxsz / pagesz;
 	struct framephy_struct *newfst, *fst;
-	int iter = 0;
+	int						iter = 0;
 
 	if (numfp <= 0)
 		return -1;
 
 	/* Init head of free framephy list */
-	fst = malloc(sizeof(struct framephy_struct));
-	fst->fpn = iter;
+	fst				 = malloc(sizeof(struct framephy_struct));
+	fst->fpn		 = iter;
 	mp->free_fp_list = fst;
 
 	/* We have list with first element, fill in the rest num-1 element member*/
-	for (iter = 1; iter < numfp; iter++)
-	{
-		newfst = malloc(sizeof(struct framephy_struct));
-		newfst->fpn = iter;
+	for (iter = 1; iter < numfp; iter++) {
+		newfst			= malloc(sizeof(struct framephy_struct));
+		newfst->fpn		= iter;
 		newfst->fp_next = NULL;
-		fst->fp_next = newfst;
-		fst = newfst;
+		fst->fp_next	= newfst;
+		fst				= newfst;
 	}
 
 	return 0;
 }
 
-int MEMPHY_get_freefp(struct memphy_struct *mp, addr_t *retfpn)
-{
+int MEMPHY_get_freefp(struct memphy_struct *mp, addr_t *retfpn) {
 	struct framephy_struct *fp = mp->free_fp_list;
 
 	if (fp == NULL)
 		return -1;
 
-	*retfpn = fp->fpn;
+	*retfpn			 = fp->fpn;
 	mp->free_fp_list = fp->fp_next;
 
 	/* MEMPHY is iteratively used up until its exhausted
@@ -168,34 +160,62 @@ int MEMPHY_get_freefp(struct memphy_struct *mp, addr_t *retfpn)
 	return 0;
 }
 
-int MEMPHY_dump(struct memphy_struct *mp)
-{
-  	/*TODO dump memphy contnt mp->storage
+int MEMPHY_dump(struct memphy_struct *mp) {
+	/*TODO (Done): dump memphy contnt mp->storage
 	 *     for tracing the memory content
 	 */
+
+	for (int i = 0; i < mp->maxsz; i++) {
+		if (mp->storage[i] != 0)
+			printf("BYTE %08x: %d\n", i, mp->storage[i]);
+	}
+	
 	return 0;
 }
 
-int MEMPHY_put_freefp(struct memphy_struct *mp, addr_t fpn)
-{
-	struct framephy_struct *fp = mp->free_fp_list;
+int MEMPHY_put_freefp(struct memphy_struct *mp, addr_t fpn) {
+	struct framephy_struct *fp		= mp->free_fp_list;
 	struct framephy_struct *newnode = malloc(sizeof(struct framephy_struct));
 
 	/* Create new node with value fpn */
-	newnode->fpn = fpn;
+	newnode->fpn	 = fpn;
 	newnode->fp_next = fp;
 	mp->free_fp_list = newnode;
 
 	return 0;
 }
 
+int MEMPHY_put_usedfp(struct memphy_struct *mp, addr_t fpn) {
+	struct framephy_struct *fp		= mp->used_fp_list;
+	struct framephy_struct *newnode = malloc(sizeof(struct framephy_struct));
+
+	newnode->fpn	 = fpn;
+	newnode->fp_next = fp;
+	mp->used_fp_list = newnode;
+
+	return 0;
+}
+
+int MEMPHY_count_usedfp(struct memphy_struct *mp) {
+	struct framephy_struct *fp	  = mp->free_fp_list;
+	int						count = 0;
+
+	while (fp != NULL) {
+		count++;
+		fp = fp->fp_next;
+	}
+
+	count = (mp->maxsz / PAGING_PAGESZ) - count;
+
+	return count;
+}
+
 /*
  *  Init MEMPHY struct
  */
-int init_memphy(struct memphy_struct *mp, addr_t max_size, int randomflg)
-{
+int init_memphy(struct memphy_struct *mp, addr_t max_size, int randomflg) {
 	mp->storage = (BYTE *)malloc(max_size * sizeof(BYTE));
-	mp->maxsz = max_size;
+	mp->maxsz	= max_size;
 	memset(mp->storage, 0, max_size * sizeof(BYTE));
 
 	MEMPHY_format(mp, PAGING_PAGESZ);

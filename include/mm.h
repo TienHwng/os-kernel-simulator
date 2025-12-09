@@ -94,9 +94,12 @@
 #define PAGING_FPN(x)  GETVAL(x,PAGING_PTE_FPN_MASK,PAGING_PTE_FPN_LOBIT)
 
 /* Memory range operator */
-/* TODO implement the INCLUDE and OVERLAP checking mechanism */
-#define INCLUDE(x1,x2,y1,y2) (0)
-#define OVERLAP(x1,x2,y1,y2) (0)
+/* TODO (Done): implement the INCLUDE and OVERLAP checking mechanism */
+// #define INCLUDE(x1,x2,y1,y2) (0)
+// #define OVERLAP(x1,x2,y1,y2) (0)
+
+#define INCLUDE(x1, x2, y1, y2) (0)
+#define OVERLAP(x1, x2, y1, y2) (!((x2) <= (y1) || (y2) <= (x1)))
 
 /* VM region prototypes */
 struct vm_rg_struct * init_vm_rg(addr_t rg_start, addr_t rg_end);
@@ -156,6 +159,10 @@ int MEMPHY_read(struct memphy_struct * mp, addr_t addr, BYTE *value);
 int MEMPHY_write(struct memphy_struct * mp, addr_t addr, BYTE data);
 int MEMPHY_dump(struct memphy_struct * mp);
 int init_memphy(struct memphy_struct *mp, addr_t max_size, int randomflg);
+
+/* Lam them o day */
+int MEMPHY_put_usedfp(struct memphy_struct *mp, addr_t fpn);
+int MEMPHY_count_usedfp(struct memphy_struct *mp);
 
 /* print list */
 int print_list_fp(struct framephy_struct *fp);
