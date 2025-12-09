@@ -379,11 +379,11 @@ int pg_getval(struct mm_struct *mm, addr_t addr, BYTE *data, struct pcb_t *calle
 	addr_t off = PAGING_OFFST(addr);
 	int fpn;
 
-	printf("DEBUG\n");
-	printf("PG_GETVAL: addr= %llu pgn= %u off= %u\n\n",
-           (unsigned long long)addr,
-           (unsigned)pgn,
-           (unsigned)off);
+	// printf("DEBUG\n");
+	// printf("PG_GETVAL: addr= %llu pgn= %u off= %u\n\n",
+    //        (unsigned long long)addr,
+    //        (unsigned)pgn,
+    //        (unsigned)off);
 	
 	if (pg_getpage(mm, pgn, &fpn, caller) != 0)
 		return -1; /* invalid page access */
@@ -418,9 +418,9 @@ int pg_setval(struct mm_struct *mm, addr_t addr, BYTE value, struct pcb_t *calle
 	addr_t off = PAGING_OFFST(addr);
 	int fpn;
 
-	printf("DEBUG\n");
-	printf("PAGING64_ADDR_OFFST_MASK: %llu\n", (unsigned long long)PAGING64_ADDR_OFFST_MASK);
-    printf("PG_SETVAL: addr= %llu pgn= %llu off= %llu\n\n", (unsigned long long)addr, (unsigned long long)pgn, (unsigned long long)off);
+	// printf("DEBUG\n");
+	// printf("PAGING64_ADDR_OFFST_MASK: %llu\n", (unsigned long long)PAGING64_ADDR_OFFST_MASK);
+    // printf("PG_SETVAL: addr= %llu pgn= %llu off= %llu\n\n", (unsigned long long)addr, (unsigned long long)pgn, (unsigned long long)off);
 	
 	/* Get the page to MEMRAM, swap from MEMSWAP if needed */
 	if (pg_getpage(mm, pgn, &fpn, caller) != 0)
@@ -490,8 +490,8 @@ int libread(
     printf("%s:%d\n", __func__, __LINE__);
 #ifdef IODUMP
 	/* TODO dump IO content (if needed) */
-	printf("===== LIBREAD: =====\n");
-    printf("read region=%d offset=%d value=%d\n", source, offset, data);
+	// printf("===== LIBREAD: =====\n");
+    // printf("read region=%d offset=%d value=%d\n", source, offset, data);
 #ifdef PAGETBL_DUMP
 	print_pgtbl(proc, 0, -1); // print max TBL
 #endif

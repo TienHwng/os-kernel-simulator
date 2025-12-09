@@ -8,19 +8,20 @@
  * for the sole purpose of studying while attending the course CO2018.
  */
 
-#include "os-mm.h"
-#include "syscall.h"
 #include "libmem.h"
+#include "os-mm.h"
 #include "queue.h"
+#include "syscall.h"
 #include <stdlib.h>
 
+#define MM64
 #ifdef MM64
 #include "mm64.h"
 #else
 #include "mm.h"
 #endif
 
-//typedef char BYTE;
+// typedef char BYTE;
 
 int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
 {
@@ -47,7 +48,7 @@ int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
 	/* user process are not allowed to access directly pcb in kernel space of syscall */
 	//....
 	
-	printf("SYSCALL: a1= %d, a2= %d, a3= %d\n", memop, regs->a2, regs->a3);
+	// printf("SYSCALL: a1= %d, a2= %d, a3= %d\n", memop, regs->a2, regs->a3);
     if (krnl->mm == NULL) {
         printf("Error: krnl->mm is NULL in __sys_memmap\n");
         free(caller);
@@ -81,5 +82,3 @@ int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
    
 	return 0;
 }
-
-
