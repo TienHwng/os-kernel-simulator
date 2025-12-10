@@ -873,6 +873,14 @@
 #include <stdlib.h>
 #include <time.h>
 
+/* Mỗi entry của từng level sẽ cover vùng địa chỉ bao nhiêu byte */
+#define PGD_SPAN_BYTES   (1ULL << PAGING64_ADDR_P4D_LOBIT)  /* 2^39  = 512 GB  */
+#define P4D_SPAN_BYTES   (1ULL << PAGING64_ADDR_PUD_LOBIT)  /* 2^30  =   1 GB  */
+#define PUD_SPAN_BYTES   (1ULL << PAGING64_ADDR_PMD_LOBIT)  /* 2^21  =   2 MB  */
+#define PMD_SPAN_BYTES   (1ULL << PAGING64_ADDR_PT_LOBIT)   /* 2^12  =   4 KB  */
+#define PT_SPAN_BYTES    PAGING64_PAGESZ                    /* trang cuối = 4 KB */
+
+
 #if defined(MM64)
 /*
  * 
@@ -1568,56 +1576,172 @@ int print_list_pgn(struct pgn_t *ip) {
 //     return 0;
 // }
 
-int print_pgtbl(struct pcb_t *caller, addr_t start, addr_t end) {
+// int print_pgtbl(struct pcb_t *caller, addr_t start, addr_t end) {
+//     if (caller == NULL) {
+//         printf("No caller provided\n");
+//         return -1;
+//     }
+
+//     if (end == -1) {
+//         struct vm_area_struct *cur_vma = get_vma_by_num(caller->krnl->mm, 0);
+//         if (cur_vma) end = cur_vma->vm_end;
+//         else end = 0;
+//     }
+
+//     struct mm_struct *mm = caller->krnl->mm;
+//     addr_t pgd_idx, p4d_idx, pud_idx, pmd_idx, pt_idx;
+
+//     printf("print_pgtbl:\n");
+
+//     if (mm->pgd != NULL) {
+//         get_pd_from_address(start, &pgd_idx, &p4d_idx, &pud_idx, &pmd_idx, &pt_idx);
+
+//         addr_t pgd_val = mm->pgd[pgd_idx];
+//         if (pgd_val == 0) return 0;
+
+//         addr_t *p4d_base = (addr_t *)pgd_val;
+//         addr_t p4d_val = p4d_base[p4d_idx];
+//         if (p4d_val == 0) return 0;
+
+//         addr_t *pud_base = (addr_t *)p4d_val;
+//         addr_t pud_val = pud_base[pud_idx];
+//         if (pud_val == 0) return 0;
+
+//         addr_t *pmd_base = (addr_t *)pud_val;
+//         addr_t pmd_val = pmd_base[pmd_idx];
+//         if (pmd_val == 0) return 0;
+
+//         addr_t *pt_base = (addr_t *)pmd_val;
+//         addr_t pte = pt_base[pt_idx]; 
+
+//         printf(" PGD=%016lx P4D=%016lx PUD=%016lx PMD=%016lx\n", 
+//                pgd_val, p4d_val, pud_val, pmd_val);
+
+//         addr_t pgn = start >> PAGING64_ADDR_PT_LOBIT; // dịch phải 12 bit offset
+        
+//         addr_t fpn = GETVAL(pte, PAGING_PTE_FPN_MASK, PAGING_PTE_FPN_LOBIT);
+
+//         printf("Page Number: %ld -> Frame Number: %ld\n", pgn, fpn);
+//     }
+
+//     return 0;
+// }
+
+#ifdef MM64
+
+int print_pgtbl(struct pcb_t *caller, addr_t start, addr_t end)
+{
     if (caller == NULL) {
-        printf("No caller provided\n");
+        printf("print_pgtbl: caller == NULL\n");
         return -1;
     }
 
-    if (end == -1) {
-        struct vm_area_struct *cur_vma = get_vma_by_num(caller->krnl->mm, 0);
-        if (cur_vma) end = cur_vma->vm_end;
-        else end = 0;
+    struct mm_struct *mm = caller->krnl->mm;
+    if (mm == NULL || mm->pgd == NULL) {
+        printf("print_pgtbl: mm or pgd == NULL\n");
+        return -1;
     }
 
-    struct mm_struct *mm = caller->krnl->mm;
-    addr_t pgd_idx, p4d_idx, pud_idx, pmd_idx, pt_idx;
+    /* Nếu end = -1 thì in đúng 1 page chứa start (giống style mm.c) */
+    if ((addr_t)end == (addr_t)-1) {
+        end = start + PAGING64_PAGESZ;
+    }
 
-    printf("print_pgtbl:\n");
+    addr_t pgn_start = PAGING_PGN(start);
+    addr_t pgn_end   = PAGING_PGN(end);
 
-    if (mm->pgd != NULL) {
-        get_pd_from_address(start, &pgd_idx, &p4d_idx, &pud_idx, &pmd_idx, &pt_idx);
+    for (addr_t pgn = pgn_start; pgn < pgn_end; ++pgn) {
+        addr_t vaddr = pgn << PAGING64_ADDR_PT_SHIFT;
+        // addr_t vaddr = pgn << 48;
 
+        /* Tách 5 index từ page number */
+        addr_t pgd_idx, p4d_idx, pud_idx, pmd_idx, pt_idx;
+        get_pd_from_pagenum(pgn, &pgd_idx, &p4d_idx, &pud_idx, &pmd_idx, &pt_idx);
+
+        printf("VA 0x%016lx (page# %ld)\n", (unsigned long)vaddr, (long)pgn);
+
+        /* ----- Level 5: PGD ----- */
         addr_t pgd_val = mm->pgd[pgd_idx];
-        if (pgd_val == 0) return 0;
+        printf("  PGD[%3lu] covers %6llu GB -> P4D table @ 0x%016lx\n",
+               (unsigned long)pgd_idx,
+               (unsigned long long)(PGD_SPAN_BYTES >> 30),   /* in GB */
+               (unsigned long)pgd_val);
 
-        addr_t *p4d_base = (addr_t *)pgd_val;
-        addr_t p4d_val = p4d_base[p4d_idx];
-        if (p4d_val == 0) return 0;
+        if (!pgd_val) {
+            printf("    (PGD entry not present)\n\n");
+            continue;
+        }
 
-        addr_t *pud_base = (addr_t *)p4d_val;
-        addr_t pud_val = pud_base[pud_idx];
-        if (pud_val == 0) return 0;
+        /* ----- Level 4: P4D ----- */
+        addr_t *p4d_tab = (addr_t *)pgd_val;
+        addr_t  p4d_val = p4d_tab[p4d_idx];
+		if()
 
-        addr_t *pmd_base = (addr_t *)pud_val;
-        addr_t pmd_val = pmd_base[pmd_idx];
-        if (pmd_val == 0) return 0;
+        printf("  P4D[%3lu] covers %6llu GB -> PUD table @ 0x%016lx\n",
+               (unsigned long)p4d_idx,
+               (unsigned long long)(P4D_SPAN_BYTES >> 30),   /* in GB */
+               (unsigned long)p4d_val);
 
-        addr_t *pt_base = (addr_t *)pmd_val;
-        addr_t pte = pt_base[pt_idx]; 
+        if (!p4d_val) {
+            printf("    (P4D entry not present)\n\n");
+            continue;
+        }
 
-        printf(" PGD=%016lx P4D=%016lx PUD=%016lx PMD=%016lx\n", 
-               pgd_val, p4d_val, pud_val, pmd_val);
+        /* ----- Level 3: PUD ----- */
+        addr_t *pud_tab = (addr_t *)p4d_val;
+        addr_t  pud_val = pud_tab[pud_idx];
 
-        addr_t pgn = start >> PAGING64_ADDR_PT_LOBIT; // dịch phải 12 bit offset
-        
-        addr_t fpn = GETVAL(pte, PAGING_PTE_FPN_MASK, PAGING_PTE_FPN_LOBIT);
+        printf("  PUD[%3lu] covers %6llu MB -> PMD table @ 0x%016lx\n",
+               (unsigned long)pud_idx,
+               (unsigned long long)(PUD_SPAN_BYTES >> 20),   /* in MB */
+               (unsigned long)pud_val);
 
-        printf("Page Number: %ld -> Frame Number: %ld\n", pgn, fpn);
+        if (!pud_val) {
+            printf("    (PUD entry not present)\n\n");
+            continue;
+        }
+
+        /* ----- Level 2: PMD ----- */
+        addr_t *pmd_tab = (addr_t *)pud_val;
+        addr_t  pmd_val = pmd_tab[pmd_idx];
+
+        printf("  PMD[%3lu] covers %6llu KB -> PT  table @ 0x%016lx\n",
+               (unsigned long)pmd_idx,
+               (unsigned long long)(PMD_SPAN_BYTES >> 10),   /* in KB */
+               (unsigned long)pmd_val);
+
+        if (!pmd_val) {
+            printf("    (PMD entry not present)\n\n");
+            continue;
+        }
+
+        /* ----- Level 1: PT ----- */
+        addr_t *pt_tab = (addr_t *)pmd_val;
+        addr_t  pte    = pt_tab[pt_idx];
+
+        printf("  PT [%3lu] page size %5u B -> PTE=0x%016lx\n",
+               (unsigned long)pt_idx,
+               (unsigned)PAGING64_PAGESZ,
+               (unsigned long)pte);
+
+        /* Giải nghĩa PTE giống mm.c: frame number, present, swapped */
+        int fpn     = PAGING_PTE_FPN(pte);
+        int present = (pte & PAGING_PTE_PRESENT_MASK) ? 1 : 0;
+        int swapped = (pte & PAGING_PTE_SWAPPED_MASK) ? 1 : 0;
+
+        printf("       => frame = %d, present = %d, swapped = %d\n\n",
+               fpn, present, swapped);
+
+        /* Nếu muốn giống hệt mm.c có thể thêm:
+         * printf("Page Number: %ld -> Frame Number: %d\n", pgn, fpn);
+         */
     }
 
     return 0;
 }
+
+#endif /* MM64 */
+
 
 
 
