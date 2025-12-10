@@ -583,6 +583,15 @@ int find_victim_page(struct mm_struct *mm, addr_t *retpgn) {
 	return 0;
 }
 
+/* libdump - dump current physical memory (RAM) content */
+int libdump(struct pcb_t *proc) {
+	printf("%s:%d\n", __func__, __LINE__);
+	if (proc == NULL || proc->krnl == NULL || proc->krnl->mram == NULL)
+		return -1;
+
+	return MEMPHY_dump(proc->krnl->mram);
+}
+
 /*get_free_vmrg_area - get a free vm region
  *@caller: caller
  *@vmaid: ID vm area to alloc memory region

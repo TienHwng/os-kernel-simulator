@@ -52,6 +52,7 @@ enum ins_opcode_t {
 	FREE,  // Deallocated a memory block
 	READ,  // Write data to a byte on memory
 	WRITE, // Read data from a byte on memory
+	DUMP,  // Dump memory state
 	SYSCALL,
 };
 

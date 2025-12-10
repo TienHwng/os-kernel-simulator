@@ -88,6 +88,9 @@ int run(struct pcb_t *proc) {
 		stat = write(proc, ins.arg_0, ins.arg_1, ins.arg_2);
 #endif
 		break;
+	case DUMP:
+		stat = libdump(proc);
+		break;
 	case SYSCALL:
 		stat = libsyscall(proc, ins.arg_0, ins.arg_1, ins.arg_2, ins.arg_3);
 		break;

@@ -101,11 +101,14 @@ int MEMPHY_seq_write(struct memphy_struct *mp, addr_t addr, BYTE value) {
  *  @data: written data
  */
 int MEMPHY_write(struct memphy_struct *mp, addr_t addr, BYTE data) {
-	if (mp == NULL)
+	if (mp == NULL) {
 		return -1;
+	}
 
-	if (mp->rdmflg)
+	if (mp->rdmflg) {
 		mp->storage[addr] = data;
+	}
+
 	else 
 		/* Sequential access device */
 		return MEMPHY_seq_write(mp, addr, data);
@@ -166,8 +169,9 @@ int MEMPHY_dump(struct memphy_struct *mp) {
 	 */
 
 	for (int i = 0; i < mp->maxsz; i++) {
-		if (mp->storage[i] != 0)
+		if (mp->storage[i] != 0) {
 			printf("BYTE %08x: %d\n", i, mp->storage[i]);
+		}
 	}
 	
 	return 0;

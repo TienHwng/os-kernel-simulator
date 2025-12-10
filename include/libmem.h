@@ -21,3 +21,4 @@ int							  liballoc(struct pcb_t *, addr_t, uint32_t);
 int							  libfree(struct pcb_t *, uint32_t);
 int							  libread(struct pcb_t *, uint32_t, addr_t, uint32_t *);
 int							  libwrite(struct pcb_t *, BYTE, uint32_t, addr_t);
+int						  libdump(struct pcb_t *);

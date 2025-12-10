@@ -12,10 +12,14 @@ static uint32_t avail_pid = 1;
 #define OPT_READ	"read"
 #define OPT_WRITE	"write"
 #define OPT_SYSCALL "syscall"
+#define OPT_DUMP	"dump"
 
 static enum ins_opcode_t get_opcode(char *opt) {
 	if (!strcmp(opt, OPT_CALC)) {
 		return CALC;
+	}
+	else if (!strcmp(opt, OPT_DUMP)) {
+		return DUMP;
 	}
 	else if (!strcmp(opt, OPT_ALLOC)) {
 		return ALLOC;
@@ -86,6 +90,9 @@ struct pcb_t *load(const char *path) {
 			fscanf(file, "" FORMAT_ARG " " FORMAT_ARG " " FORMAT_ARG "\n",
 				   &proc->code->text[i].arg_0, &proc->code->text[i].arg_1,
 				   &proc->code->text[i].arg_2);
+			break;
+		case DUMP:
+			/* No operands for dump */
 			break;
 		case SYSCALL:
 			fgets(buf, sizeof(buf), file);
